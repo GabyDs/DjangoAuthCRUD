@@ -1,6 +1,7 @@
-from django.http import HttpResponse
+from django.shortcuts import render, redirect
 
-from django.shortcuts import render
+# modulo para loguear al usuario en la sesion del navegador
+from django.contrib.auth import login
 
 # modulo de formulario
 from django.contrib.auth.forms import UserCreationForm
@@ -8,28 +9,51 @@ from django.contrib.auth.forms import UserCreationForm
 # modelo de usuarios
 from django.contrib.auth.models import User
 
+# modulo de error para datos duplicados
+from django.db import IntegrityError
+
+
 # Create your views here.
 def home(request):
-    return render(request, 'home.html')
+    return render(request, "home.html")
+
 
 def signup(request):
-    if request.method == 'GET':
-        return render(request, 'signup.html', {
-            'form': UserCreationForm
-        })
+    if request.method == "GET":
+        return render(request, "signup.html", {"form": UserCreationForm})
     else:
-        passwd1 = request.POST['password1']
-        passwd2 = request.POST['password2']
-        
-        if passwd1 == passwd2:
+        if request.POST["password1"] == request.POST["password2"]:
             try:
                 # register user
-                username = request.POST['username']
+                username = request.POST["username"]
 
-                User.objects.create_user(username=username, password=passwd1).save()
+                user = User.objects.create_user(
+                    username=username, password=request.POST["password1"]
+                )
+                user.save()
 
-                return HttpResponse("Bien ahi logi, creaste un usuario nuevo!")
-            except:
-                return HttpResponse("Ya existe ese usuario boludo!")
+                login(request, user)
+
+                return redirect("tasks")
+            except IntegrityError:
+                return render(
+                    request,
+                    "signup.html",
+                    {
+                        "form": UserCreationForm,
+                        "error": "Ya existe ese usuario boludo!",
+                    },
+                )
         else:
-            return HttpResponse("Las contraseñas deben ser iguales mongolito!")
+            return render(
+                request,
+                "signup.html",
+                {
+                    "form": UserCreationForm,
+                    "error": "Las contraseñas deben ser iguales mongolito!",
+                },
+            )
+
+
+def tasks(request):
+    return render(request, "tasks.html")
