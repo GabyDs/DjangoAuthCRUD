@@ -1,10 +1,10 @@
 from django.shortcuts import render, redirect
 
 # modulo para manejar la sesion del usuario
-from django.contrib.auth import login, logout
+from django.contrib.auth import login, logout, authenticate
 
 # modulo de formulario
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 
 # modelo de usuarios
 from django.contrib.auth.models import User
@@ -62,3 +62,28 @@ def tasks(request):
 def signout(request):
     logout(request)
     return redirect("home")
+
+
+def signin(request):
+    if request.method == "GET":
+        return render(request, "signin.html", {"form": AuthenticationForm})
+    else:
+
+        user = authenticate(
+            request,
+            username=request.POST["username"],
+            password=request.POST["password"],
+        )
+
+        if user is None:
+            return render(
+                request,
+                "signin.html",
+                {
+                    "form": AuthenticationForm,
+                    "error": "Escribiste mal el usuario o la contraseña bobo!",
+                },
+            )
+        else:
+            login(request, user)
+            return redirect("tasks")
