@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 
-# modulo para loguear al usuario en la sesion del navegador
-from django.contrib.auth import login
+# modulo para manejar la sesion del usuario
+from django.contrib.auth import login, logout
 
 # modulo de formulario
 from django.contrib.auth.forms import UserCreationForm
@@ -57,3 +57,8 @@ def signup(request):
 
 def tasks(request):
     return render(request, "tasks.html")
+
+
+def signout(request):
+    logout(request)
+    return redirect("home")
