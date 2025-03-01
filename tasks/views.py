@@ -15,6 +15,8 @@ from django.db import IntegrityError
 # modulo de formulario personalizado
 from .forms import TaskForm
 
+from .models import Task
+
 
 # Create your views here.
 def home(request):
@@ -59,7 +61,8 @@ def signup(request):
 
 
 def tasks(request):
-    return render(request, "tasks.html")
+    tasks = Task.objects.filter(user=request.user, date_completed__isnull=True)
+    return render(request, "tasks.html", {"tasks": tasks})
 
 
 def create_task(request):
