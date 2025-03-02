@@ -15,6 +15,9 @@ from django.db import IntegrityError
 # modulo de formulario personalizado
 from .forms import TaskForm
 
+# modulo para manejar tiempos
+from django.utils import timezone
+
 from .models import Task
 
 
@@ -107,6 +110,21 @@ def task_detail(request, task_id):
                     "error": "Sos mongilito vos o no te enseñaron a escribir bien?",
                 },
             )
+
+
+def complete_task(request, task_id):
+    task = get_object_or_404(Task, pk=task_id, user=request.user)
+    if request.method == "POST":
+        task.date_completed = timezone.now()
+        task.save()
+        return redirect("tasks")
+
+
+def delete_task(request, task_id):
+    task = get_object_or_404(Task, pk=task_id, user=request.user)
+    if request.method == "POST":
+        task.delete()
+        return redirect("tasks")
 
 
 def signout(request):
