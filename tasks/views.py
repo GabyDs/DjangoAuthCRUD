@@ -42,7 +42,7 @@ def signup(request):
 
                 login(request, user)
 
-                return redirect("tasks")
+                return redirect("pending_tasks")
             except IntegrityError:
                 return render(
                     request,
@@ -65,7 +65,14 @@ def signup(request):
 
 def tasks(request):
     tasks = Task.objects.filter(user=request.user, date_completed__isnull=True)
-    return render(request, "tasks.html", {"tasks": tasks})
+    return render(request, "tasks.html", {"tasks": tasks, "completed": False})
+
+
+def completed_tasks(request):
+    tasks = Task.objects.filter(
+        user=request.user, date_completed__isnull=False
+    ).order_by("-date_completed")
+    return render(request, "tasks.html", {"tasks": tasks, "completed": True})
 
 
 def create_task(request):
@@ -154,4 +161,4 @@ def signin(request):
             )
         else:
             login(request, user)
-            return redirect("tasks")
+            return redirect("pending_tasks")

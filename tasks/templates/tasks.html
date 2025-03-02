@@ -1,7 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Tasks pending</h1>
+
+    {% if completed %}
+        <h1>Completed Tasks</h1>
+    {% else %}
+        <h1>Pending Tasks</h1>
+    {% endif %}
 
     <ul>
         {% for task in tasks %}
@@ -13,6 +18,9 @@
                         {{task.title}}
                     {% endif %}
                 </a>
+                {% if completed %}
+                    <p>{{task.date_completed|date:'M j Y:i'}}</p>
+                {% endif %}
             </li>
         {% endfor %}
     </ul>
