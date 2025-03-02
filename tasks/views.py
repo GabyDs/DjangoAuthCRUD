@@ -9,6 +9,9 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 # modelo de usuarios
 from django.contrib.auth.models import User
 
+# modulo para proteger rutas
+from django.contrib.auth.decorators import login_required
+
 # modulo de error para datos duplicados
 from django.db import IntegrityError
 
@@ -63,11 +66,13 @@ def signup(request):
             )
 
 
+@login_required
 def tasks(request):
     tasks = Task.objects.filter(user=request.user, date_completed__isnull=True)
     return render(request, "tasks.html", {"tasks": tasks, "completed": False})
 
 
+@login_required
 def completed_tasks(request):
     tasks = Task.objects.filter(
         user=request.user, date_completed__isnull=False
@@ -75,6 +80,7 @@ def completed_tasks(request):
     return render(request, "tasks.html", {"tasks": tasks, "completed": True})
 
 
+@login_required
 def create_task(request):
     if request.method == "GET":
         return render(request, "create_task.html", {"form": TaskForm})
@@ -96,6 +102,7 @@ def create_task(request):
             )
 
 
+@login_required
 def task_detail(request, task_id):
     if request.method == "GET":
         task = get_object_or_404(Task, pk=task_id, user=request.user)
@@ -119,6 +126,7 @@ def task_detail(request, task_id):
             )
 
 
+@login_required
 def complete_task(request, task_id):
     task = get_object_or_404(Task, pk=task_id, user=request.user)
     if request.method == "POST":
@@ -127,6 +135,7 @@ def complete_task(request, task_id):
         return redirect("tasks")
 
 
+@login_required
 def delete_task(request, task_id):
     task = get_object_or_404(Task, pk=task_id, user=request.user)
     if request.method == "POST":
@@ -134,6 +143,7 @@ def delete_task(request, task_id):
         return redirect("tasks")
 
 
+@login_required
 def signout(request):
     logout(request)
     return redirect("home")
