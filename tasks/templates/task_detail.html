@@ -2,10 +2,14 @@
 
 {% block content %}
 
-<h1>Task Detail</h1>
+<h1>{{task.title}}</h1>
 
-<h3>{{task.title}}</h3>
-<p>{{task.description}}</p>
-<p>{{task.user.username}}</p>
+{% if error %}{{error}}{% endif %}
+
+<form method="POST">
+    {% csrf_token %}
+    {{form.as_p}}
+    <button>Update</button>
+</form>
 
 {% endblock content %}
